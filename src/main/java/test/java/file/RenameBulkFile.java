@@ -20,15 +20,9 @@ public class RenameBulkFile {
 	static SortedMap<Long, String> fileDatumCheck = new TreeMap<Long, String>();
 	static Iterator<String> it;
 
-	public static void main(String[] args) throws IOException, URISyntaxException, InterruptedException {
+	public static void main(String[] args) throws IOException, URISyntaxException {
 
-		System.out.print("Hello");
-		System.out.print("\033[H\033[2J");
-		System.out.flush();
-		new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
-		System.exit(1);
-
-		for (int i = 113; i < 115; i++) {
+		for (int i = 1; i < 115; i++) {
 			String tempURL = "00" + String.valueOf(i);
 			tempURL = baseURL + tempURL.substring(tempURL.length() - 3) + ".mp3";
 			fileDownloadManager(tempURL, "Quran_Urdu_Audio_dl/" + tempURL.replace(baseURL, ""));
@@ -41,8 +35,6 @@ public class RenameBulkFile {
 	}
 
 	public static void renameFiles() {
-
-		// URL - https://qurancentral.com/audio/urdu-translation-only/
 
 //		String nameBefore = "001;002;003;004;005;006;007;008;009;010;011;012;013;014;015;016;017;018;019;020;021;022;023;024;025;026;027;028;029;030;031;032;033;034;035;036;037;038;039;040;041;042;043;044;045;046;047;048;049;050;051;052;053;054;055;056;057;058;059;060;061;062;063;064;065;066;067;068;069;070;071;072;073;074;075;076;077;078;079;080;081;082;083;084;085;086;087;088;089;090;091;092;093;094;095;096;097;098;099;100;101;102;103;104;105;106;107;108;109;110;111;112;113;114";
 
@@ -87,10 +79,11 @@ public class RenameBulkFile {
 		Iterator<Long> itt = fileDatumCheck.keySet().iterator();
 		while (itt.hasNext()) {
 			String temp = fileDatumCheck.get(itt.next());
+			System.out.println("temp: " + temp + "  ;  " + temp.lastIndexOf("/") + " ; " + temp.substring(0, 55 + 1));
 			name = temp.split("/")[temp.split("/").length - 1];
-			myURL = temp.split("/")[0];
+			myURL = temp;
 			URL ipp = new URL(myURL);
-			fileDownloader(FILE_URL, FILE_NAME, ip);
+			fileDownloader(myURL, name, ipp);
 		}
 
 	}
