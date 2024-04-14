@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
@@ -16,21 +15,19 @@ import java.util.TreeMap;
 public class RenameBulkFile {
 
 	public static final String baseURL = "https://podcasts.qurancentral.com/urdu-translation-only/";
+
+	public static final int dlProgressDivisor = 17;
 	static SortedMap<Long, String> fileDatum = new TreeMap<Long, String>();
 	static SortedMap<Long, String> fileDatumCheck = new TreeMap<Long, String>();
 	static Iterator<String> it;
 
 	public static void main(String[] args) throws IOException, URISyntaxException {
 
-		for (int i = 1; i < 115; i++) {
-			String tempURL = "00" + String.valueOf(i);
-			tempURL = baseURL + tempURL.substring(tempURL.length() - 3) + ".mp3";
-			fileDownloadManager(tempURL, "Quran_Urdu_Audio_dl/" + tempURL.replace(baseURL, ""));
-		}
-
-		System.out.println("Size: " + fileDatum.size() + ", fileDatum: " + fileDatum);
+        fileDownloadManager(44,46);
 
 		System.out.println("Size: " + fileDatumCheck.size() + ", fileDatumCheck: " + fileDatumCheck);
+
+		System.out.println("Size: " + fileDatum.size() + ", fileDatum: " + fileDatum);
 
 	}
 
@@ -61,73 +58,89 @@ public class RenameBulkFile {
 		}
 	}
 
-	public static void fileDownloadManager(String FILE_URL, String FILE_NAME)
-			throws MalformedURLException, IOException, URISyntaxException {
-		URL ip = new URL(FILE_URL);
-		long fileSize = ip.openConnection().getContentLength();
-		System.out.println("******************** File: '" + ip.getFile().split("/")[ip.getFile().split("/").length - 1]
-				+ "' Size: " + getUnit(fileSize) + " ********************");
+	public static void fileDownloadManager(int startNum, int endNum)
+			throws IOException, URISyntaxException {
+		System.out.println("******************** Total files to download: "+(endNum-startNum+1)+" ********************");
+		for (int i = startNum; i <= endNum; i++) {
+			String tempURL = "00" + i;
+			String substring = tempURL.substring(tempURL.length() - 3);
+			String FILE_NAME = "Quran_Urdu_Audio_dl/"+ substring + ".mp3";
 
-//		fileDownloader(FILE_URL, FILE_NAME, ip);
+			File filee = new File(FILE_NAME);
 
-		fileSizeFetcher(FILE_URL, FILE_NAME, ip);
+			boolean isFileNew = !filee.exists();
 
-		// Now download files in order of their size, ascending
+			String FILE_URL = baseURL + substring + ".mp3";
+			URL ip = new URL(FILE_URL);
+			long fileSize = ip.openConnection().getContentLength();
+			System.out.println("******************** File: '" + ip.getFile().split("/")[ip.getFile().split("/").length - 1]
+					+ "' Size: " + getUnit(fileSize) + ", File name: "+FILE_NAME+" ********************");
 
-		String name = "";
-		String myURL = "";
-		Iterator<Long> itt = fileDatumCheck.keySet().iterator();
-		while (itt.hasNext()) {
-			String temp = fileDatumCheck.get(itt.next());
-			System.out.println("temp: " + temp + "  ;  " + temp.lastIndexOf("/") + " ; " + temp.substring(0, 55 + 1));
-			name = temp.split("/")[temp.split("/").length - 1];
-			myURL = temp;
-			URL ipp = new URL(myURL);
-			fileDownloader(myURL, name, ipp);
+			fileSizeFetcher(FILE_URL, FILE_NAME);
+
+			// Now download files in order of their size, ascending
+
+            String myURL = "";
+			Iterator<Long> itt = fileDatumCheck.keySet().iterator();
+			while (itt.hasNext()) {
+                myURL = fileDatumCheck.get(itt.next());
+				if(isFileNew){
+                fileDownloader(myURL, FILE_NAME);
+				}
+				else
+					System.out.println("File download SKIPPED as it already exists, with URL: "+myURL);
+			}
 		}
 
 	}
 
-	public static void fileDownloader(String FILE_URL, String FILE_NAME, URL ip)
+	public static void fileDownloader(String FILE_URL, String folderFILE_NAME)
 			throws IOException, URISyntaxException {
-		int totalBytesRead = 0;
-		double fileDlProgress = 0.0f;
-		ip = new URL(FILE_URL);
+		long totalBytesRead = 0;
+		URL ip = new URL(FILE_URL);
 		long fileSize = ip.openConnection().getContentLength();
 		fileDatum.put(fileSize, ip.toURI().toString());
 
 		try (BufferedInputStream in = new BufferedInputStream(new URL(FILE_URL).openStream());
-				FileOutputStream fileOutputStream = new FileOutputStream(FILE_NAME)) {
-			byte dataBuffer[] = new byte[1024];
+				FileOutputStream fileOutputStream = new FileOutputStream(folderFILE_NAME)) {
+			byte[] dataBuffer = new byte[1024];
 			int bytesRead;
+			double tempInt = 0;
+			String FILE_NAME = folderFILE_NAME.split("/")[1];
+			System.out.println("Download started for file: "+FILE_NAME+", size: "+getUnit(fileSize));
+
 			while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-				totalBytesRead = totalBytesRead + bytesRead;
-				fileDlProgress = (totalBytesRead * 100) / fileSize;
-				System.out.println("Bytes %: " + fileDlProgress);
-				System.out.println("Download Progress - " + fileDlProgress);
-				if (fileSize == totalBytesRead)
-					System.out.println("Downloaded successfully - " + FILE_NAME + "\n");
+				double fileDlProgress = 0.0f;
+				totalBytesRead = (totalBytesRead + bytesRead);
+				fileDlProgress = (double) ((totalBytesRead*100) / fileSize);
+
+				if((tempInt!=fileDlProgress)&&fileDlProgress%dlProgressDivisor==0) {
+					System.out.println("Download progress for file: - '" + FILE_NAME + "' - " + String.format("%.0f", fileDlProgress) + "%");
+					tempInt = (int) fileDlProgress;
+				}
+				if (fileSize == totalBytesRead) {
+					System.out.println("Downloaded successfully - '" + FILE_NAME + "', file size: "+getUnit(fileSize)+"\n");
+					Thread.sleep(300);
+				}
 				fileOutputStream.write(dataBuffer, 0, bytesRead);
 			}
 			fileOutputStream.flush();
-			in.close();
-		} catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
 
 	}
 
-	public static void fileSizeFetcher(String FILE_URL, String FILE_NAME, URL ip)
+	public static void fileSizeFetcher(String FILE_URL, String FILE_NAME)
 			throws IOException, URISyntaxException {
-		ip = new URL(FILE_URL);
+		URL ip = new URL(FILE_URL);
 		long fileSize = ip.openConnection().getContentLength();
 		fileDatumCheck.put(fileSize, ip.toURI().toString());
 
 		try (BufferedInputStream in = new BufferedInputStream(null);
 				FileOutputStream fileOutputStream = new FileOutputStream(FILE_NAME)) {
 			fileOutputStream.flush();
-			in.close();
-		} catch (IOException e) {
+        } catch (IOException e) {
 			e.printStackTrace();
 		}
 
