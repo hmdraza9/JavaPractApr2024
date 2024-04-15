@@ -5,13 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="91150c3f-a0a3-42a5-bdd1-f60cd4ee035f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.settings/org.eclipse.jdt.core.prefs" beforeDir="false" afterPath="$PROJECT_DIR$/.settings/org.eclipse.jdt.core.prefs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/test/java/file/RenameBulkFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/test/java/file/RenameBulkFile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/JavaPractice/JavaPractApr2024/App.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/JavaPractice/JavaPractApr2024/App.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/test/java/file/RenameBulkFile.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/test/java/file/RenameBulkFile.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/JavaPractice/JavaPractApr2024/AppTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/JavaPractice/JavaPractApr2024/AppTest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Quran_Urdu_Audio_dl/101.mp3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Quran_Urdu_Audio_dl/102.mp3" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
