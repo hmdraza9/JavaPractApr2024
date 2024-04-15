@@ -12,18 +12,18 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class RenameBulkFile {
+public class RenameBulkFile   {
 
 	public static final String baseURL = "https://podcasts.qurancentral.com/urdu-translation-only/";
 
-	public static final int dlProgressDivisor = 17;
+	public static final int dlProgressDivisor = 10;
 	static SortedMap<Long, String> fileDatum = new TreeMap<Long, String>();
 	static SortedMap<Long, String> fileDatumCheck = new TreeMap<Long, String>();
 	static Iterator<String> it;
 
 	public static void main(String[] args) throws IOException, URISyntaxException {
 
-        fileDownloadManager(44,46);
+        fileDownloadManager(100,104);
 
 		System.out.println("Size: " + fileDatumCheck.size() + ", fileDatumCheck: " + fileDatumCheck);
 
@@ -41,7 +41,7 @@ public class RenameBulkFile {
 		Map<String, String> nameMap = new HashMap<String, String>();
 
 		for (String str : nameAfter.split(";")) {
-			nameMap.put(str.substring(0, 3), str.substring(4, str.length()));
+			nameMap.put(str.substring(0, 3), str.substring(4));
 		}
 
 		it = nameMap.keySet().iterator();
@@ -66,9 +66,9 @@ public class RenameBulkFile {
 			String substring = tempURL.substring(tempURL.length() - 3);
 			String FILE_NAME = "Quran_Urdu_Audio_dl/"+ substring + ".mp3";
 
-			File filee = new File(FILE_NAME);
+			File fileCheckForNew = new File(FILE_NAME);
 
-			boolean isFileNew = !filee.exists();
+			boolean isFileNew = !fileCheckForNew.exists();
 
 			String FILE_URL = baseURL + substring + ".mp3";
 			URL ip = new URL(FILE_URL);
@@ -81,52 +81,49 @@ public class RenameBulkFile {
 			// Now download files in order of their size, ascending
 
             String myURL = "";
-			Iterator<Long> itt = fileDatumCheck.keySet().iterator();
-			while (itt.hasNext()) {
-                myURL = fileDatumCheck.get(itt.next());
-				if(isFileNew){
-                fileDownloader(myURL, FILE_NAME);
-				}
-				else
-					System.out.println("File download SKIPPED as it already exists, with URL: "+myURL);
-			}
+            for (Long aLong : fileDatumCheck.keySet()) {
+                myURL = fileDatumCheck.get(aLong);
+				fileDownloader(myURL, FILE_NAME, isFileNew);            }
 		}
 
 	}
 
-	public static void fileDownloader(String FILE_URL, String folderFILE_NAME)
+	public static void fileDownloader(String FILE_URL, String folderFILE_NAME, boolean isFileNew)
 			throws IOException, URISyntaxException {
-		long totalBytesRead = 0;
-		URL ip = new URL(FILE_URL);
-		long fileSize = ip.openConnection().getContentLength();
-		fileDatum.put(fileSize, ip.toURI().toString());
+		if(isFileNew){
+			System.out.println("Is file new?: "+ true +", file name: "+folderFILE_NAME);
+			long totalBytesRead = 0;
+			URL ip = new URL(FILE_URL);
+			long fileSize = ip.openConnection().getContentLength();
+			fileDatum.put(fileSize, ip.toURI().toString());
 
-		try (BufferedInputStream in = new BufferedInputStream(new URL(FILE_URL).openStream());
-				FileOutputStream fileOutputStream = new FileOutputStream(folderFILE_NAME)) {
-			byte[] dataBuffer = new byte[1024];
-			int bytesRead;
-			double tempInt = 0;
-			String FILE_NAME = folderFILE_NAME.split("/")[1];
-			System.out.println("Download started for file: "+FILE_NAME+", size: "+getUnit(fileSize));
+			try (BufferedInputStream in = new BufferedInputStream(new URL(FILE_URL).openStream());
+				 FileOutputStream fileOutputStream = new FileOutputStream(folderFILE_NAME)) {
+				byte[] dataBuffer = new byte[1024];
+				int bytesRead;
+				double tempInt = 0;
+				String FILE_NAME = folderFILE_NAME.split("/")[1];
+				System.out.println("Download started for file: "+FILE_NAME+", size: "+getUnit(fileSize));
 
-			while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-				double fileDlProgress = 0.0f;
-				totalBytesRead = (totalBytesRead + bytesRead);
-				fileDlProgress = (double) ((totalBytesRead*100) / fileSize);
+				while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+					double fileDlProgress = 0.0f;
+					totalBytesRead = (totalBytesRead + bytesRead);
+					fileDlProgress = (double) ((totalBytesRead*100) / fileSize);
 
-				if((tempInt!=fileDlProgress)&&fileDlProgress%dlProgressDivisor==0) {
-					System.out.println("Download progress for file: - '" + FILE_NAME + "' - " + String.format("%.0f", fileDlProgress) + "%");
-					tempInt = (int) fileDlProgress;
+					if((tempInt!=fileDlProgress)&&fileDlProgress%dlProgressDivisor==0) {
+						System.out.println("Download progress for file: - '" + FILE_NAME + "' - " + String.format("%.0f", fileDlProgress) + "%");
+						tempInt = (int) fileDlProgress;
+					}
+					if (fileSize == totalBytesRead) {
+						System.out.println("Downloaded successfully - '" + FILE_NAME + "', file size: "+getUnit(fileSize)+"\n");
+						Thread.sleep(300);
+					}
+					fileOutputStream.write(dataBuffer, 0, bytesRead);
 				}
-				if (fileSize == totalBytesRead) {
-					System.out.println("Downloaded successfully - '" + FILE_NAME + "', file size: "+getUnit(fileSize)+"\n");
-					Thread.sleep(300);
-				}
-				fileOutputStream.write(dataBuffer, 0, bytesRead);
+				fileOutputStream.flush();
+			} catch (IOException | InterruptedException e) {
+				e.printStackTrace();
 			}
-			fileOutputStream.flush();
-        } catch (IOException | InterruptedException e) {
-			e.printStackTrace();
 		}
 
 	}
@@ -165,5 +162,4 @@ public class RenameBulkFile {
 
 		return unit;
 	}
-
 }
