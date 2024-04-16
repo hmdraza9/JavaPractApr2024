@@ -5,8 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="91150c3f-a0a3-42a5-bdd1-f60cd4ee035f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Quran_Urdu_Audio_dl/101.mp3" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Quran_Urdu_Audio_dl/102.mp3" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/JavaPractApr2024.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Quran_Urdu_Audio/New Text Document.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Quran_Urdu_Audio_dl/New Text Document.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/test/java/file/RenameBulkFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/test/java/file/RenameBulkFile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/test/java/file/RenameBulkFile.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/test/java/file/RenameBulkFile.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,10 +50,19 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/WSs/OnboardingLearn",
-    "settings.editor.selected.configurable": "reference.projectsettings.compiler.javacompiler"
+    "last_opened_file_path": "C:/GitClones/JavaPractApr2024/Quran_Urdu_Audio_dl",
+    "project.structure.last.edited": "SDKs",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "preferences.lookFeel"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\GitClones\JavaPractApr2024\Quran_Urdu_Audio_dl" />
+      <recent name="C:\GitClones\JavaPractApr2024" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="RenameBulkFile" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="test.java.file.RenameBulkFile" />

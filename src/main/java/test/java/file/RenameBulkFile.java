@@ -6,13 +6,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class RenameBulkFile   {
+import org.apache.commons.io.FileUtils;
+
+public class RenameBulkFile {
 
 	public static final String baseURL = "https://podcasts.qurancentral.com/urdu-translation-only/";
 
@@ -21,17 +25,29 @@ public class RenameBulkFile   {
 	static SortedMap<Long, String> fileDatumCheck = new TreeMap<Long, String>();
 	static Iterator<String> it;
 
+	public static final String dlFolder = "Quran_Urdu_Audio_dl/";
+
+	public static final String dataFolder = "Quran_Urdu_Audio/";
+
+	static long totalSize;
+
 	public static void main(String[] args) throws IOException, URISyntaxException {
-
-        fileDownloadManager(100,104);
-
-		System.out.println("Size: " + fileDatumCheck.size() + ", fileDatumCheck: " + fileDatumCheck);
-
-		System.out.println("Size: " + fileDatum.size() + ", fileDatum: " + fileDatum);
-
+		fileDownloadManager(16, 19);
+		renameFiles();
+		System.out.println("Total files size: " + getUnit(totalSize));
 	}
 
-	public static void renameFiles() {
+	public static void renameFiles1() {
+		File file = new File("Quran_Urdu_Audio_dl/001.mp3");
+		File file2 = new File("Quran_Urdu_Audio_dl/");
+		System.out.println("file2.isDirectory(): " + file2.isDirectory());
+		System.out.println("file2.listFiles(): " + file2.listFiles());
+		for (File f : file2.listFiles())
+			System.out.println(f.getName());
+//		System.out.println(file.renameTo(new File("Quran_Urdu_Audio/001_.mp3")));
+	}
+
+	public static void renameFiles() throws IOException {
 
 //		String nameBefore = "001;002;003;004;005;006;007;008;009;010;011;012;013;014;015;016;017;018;019;020;021;022;023;024;025;026;027;028;029;030;031;032;033;034;035;036;037;038;039;040;041;042;043;044;045;046;047;048;049;050;051;052;053;054;055;056;057;058;059;060;061;062;063;064;065;066;067;068;069;070;071;072;073;074;075;076;077;078;079;080;081;082;083;084;085;086;087;088;089;090;091;092;093;094;095;096;097;098;099;100;101;102;103;104;105;106;107;108;109;110;111;112;113;114";
 
@@ -41,30 +57,40 @@ public class RenameBulkFile   {
 		Map<String, String> nameMap = new HashMap<String, String>();
 
 		for (String str : nameAfter.split(";")) {
-			nameMap.put(str.substring(0, 3), str.substring(4));
+			nameMap.put(str.substring(0, 3), str.substring(6));
 		}
 
-		it = nameMap.keySet().iterator();
 
-		while (it.hasNext()) {
-			String nameTemp = it.next();
-			File file = new File(System.getProperty("user.dir") + "/Quran_Urdu_Audio/" + nameTemp + ".mp3");
+		List<String> downloadedFileList = Arrays.asList(new File(dlFolder).list());
 
-			File newFile = new File(System.getProperty("user.dir") + "/Quran_Urdu_Audio/" + nameTemp + " "
-					+ nameMap.get(nameTemp) + ".mp3");
+		for (String dlFileName : downloadedFileList) {
+			System.out.println("dlFileName: "+dlFileName);
+			System.out.println("Length: "+dlFileName.split("[.]").length);
 
-			System.out.println("Name: " + newFile.getName() + ", rename success? " + file.renameTo(newFile));
+			String headerFileName = dlFileName.split("[.]")[0];
 
+			String dlFileReName = headerFileName+" - "+nameMap.get(headerFileName)+".mp3";
+
+			File file = new File(dlFolder + dlFileName);
+
+			File newFile = new File(dataFolder + dlFileReName);
+
+
+			if(newFile.exists()) {
+				System.out.println("File already present, rename skipped! "+newFile.getName());
+			}
+			else
+				FileUtils.moveFile(file, newFile);
+
+			System.out.println("File renamed successfully? " + newFile.exists());
 		}
 	}
 
-	public static void fileDownloadManager(int startNum, int endNum)
-			throws IOException, URISyntaxException {
-		System.out.println("******************** Total files to download: "+(endNum-startNum+1)+" ********************");
+	public static void fileDownloadManager(int startNum, int endNum) throws IOException, URISyntaxException {
 		for (int i = startNum; i <= endNum; i++) {
 			String tempURL = "00" + i;
 			String substring = tempURL.substring(tempURL.length() - 3);
-			String FILE_NAME = "Quran_Urdu_Audio_dl/"+ substring + ".mp3";
+			String FILE_NAME = "Quran_Urdu_Audio_dl/" + substring + ".mp3";
 
 			File fileCheckForNew = new File(FILE_NAME);
 
@@ -73,28 +99,27 @@ public class RenameBulkFile   {
 			String FILE_URL = baseURL + substring + ".mp3";
 			URL ip = new URL(FILE_URL);
 			long fileSize = ip.openConnection().getContentLength();
-			System.out.println("******************** File: '" + ip.getFile().split("/")[ip.getFile().split("/").length - 1]
-					+ "' Size: " + getUnit(fileSize) + ", File name: "+FILE_NAME+" ********************");
+			System.out.println("******************** File: '"
+					+ ip.getFile().split("/")[ip.getFile().split("/").length - 1] + "' Size: " + getUnit(fileSize)
+					+ ", Total size: " + getUnit(totalSize) + ", File name: " + FILE_NAME + " ********************");
 
 			fileSizeFetcher(FILE_URL, FILE_NAME);
 
 			// Now download files in order of their size, ascending
-
-            String myURL = "";
-            for (Long aLong : fileDatumCheck.keySet()) {
-                myURL = fileDatumCheck.get(aLong);
-				fileDownloader(myURL, FILE_NAME, isFileNew);            }
+			String fileURL = baseURL + FILE_NAME.split("/")[FILE_NAME.split("/").length - 1];
+			fileDownloader(fileURL, FILE_NAME, isFileNew);
 		}
 
 	}
 
 	public static void fileDownloader(String FILE_URL, String folderFILE_NAME, boolean isFileNew)
 			throws IOException, URISyntaxException {
-		if(isFileNew){
-			System.out.println("Is file new?: "+ true +", file name: "+folderFILE_NAME);
+		if (isFileNew) {
+			System.out.println("File doesn't exist, downloading... '" + folderFILE_NAME + "'");
 			long totalBytesRead = 0;
 			URL ip = new URL(FILE_URL);
 			long fileSize = ip.openConnection().getContentLength();
+			totalSize = totalSize + fileSize;
 			fileDatum.put(fileSize, ip.toURI().toString());
 
 			try (BufferedInputStream in = new BufferedInputStream(new URL(FILE_URL).openStream());
@@ -103,19 +128,23 @@ public class RenameBulkFile   {
 				int bytesRead;
 				double tempInt = 0;
 				String FILE_NAME = folderFILE_NAME.split("/")[1];
-				System.out.println("Download started for file: "+FILE_NAME+", size: "+getUnit(fileSize));
+				System.out.println("Download started for file: " + FILE_NAME + ", size: " + getUnit(fileSize));
 
 				while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
 					double fileDlProgress = 0.0f;
 					totalBytesRead = (totalBytesRead + bytesRead);
-					fileDlProgress = (double) ((totalBytesRead*100) / fileSize);
+					fileDlProgress = (double) ((totalBytesRead * 100) / fileSize);
 
-					if((tempInt!=fileDlProgress)&&fileDlProgress%dlProgressDivisor==0) {
-						System.out.println("Download progress for file: - '" + FILE_NAME + "' - " + String.format("%.0f", fileDlProgress) + "%");
+					if ((tempInt != fileDlProgress) && fileDlProgress % dlProgressDivisor == 0) {
+						System.out.println("Download progress for file: - '" + FILE_NAME + "' - "
+								+ String.format("%.0f", fileDlProgress) + "%" + " - "
+								+ (getUnit(totalBytesRead).replaceAll(" ", "") + " / "
+								+ getUnit(fileSize).replaceAll(" ", "")));
 						tempInt = (int) fileDlProgress;
 					}
 					if (fileSize == totalBytesRead) {
-						System.out.println("Downloaded successfully - '" + FILE_NAME + "', file size: "+getUnit(fileSize)+"\n");
+						System.out.println("Downloaded successfully - '" + FILE_NAME + "', file size: "
+								+ getUnit(fileSize) + "\n");
 						Thread.sleep(300);
 					}
 					fileOutputStream.write(dataBuffer, 0, bytesRead);
@@ -124,20 +153,20 @@ public class RenameBulkFile   {
 			} catch (IOException | InterruptedException e) {
 				e.printStackTrace();
 			}
-		}
+		} else
+			System.out.println("File exists, download SKIPPED for " + folderFILE_NAME);
 
 	}
 
-	public static void fileSizeFetcher(String FILE_URL, String FILE_NAME)
-			throws IOException, URISyntaxException {
+	public static void fileSizeFetcher(String FILE_URL, String FILE_NAME) throws IOException, URISyntaxException {
 		URL ip = new URL(FILE_URL);
 		long fileSize = ip.openConnection().getContentLength();
 		fileDatumCheck.put(fileSize, ip.toURI().toString());
 
 		try (BufferedInputStream in = new BufferedInputStream(null);
-				FileOutputStream fileOutputStream = new FileOutputStream(FILE_NAME)) {
+			 FileOutputStream fileOutputStream = new FileOutputStream(FILE_NAME)) {
 			fileOutputStream.flush();
-        } catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
