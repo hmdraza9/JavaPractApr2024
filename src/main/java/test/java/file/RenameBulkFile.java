@@ -32,8 +32,8 @@ public class RenameBulkFile {
 	static long totalSize;
 
 	public static void main(String[] args) throws IOException, URISyntaxException {
-		fileDownloadManager(16, 19);
-		renameFiles();
+		fileDownloadManager(2, 2);
+//		renameFiles();
 		System.out.println("Total files size: " + getUnit(totalSize));
 	}
 
@@ -60,26 +60,23 @@ public class RenameBulkFile {
 			nameMap.put(str.substring(0, 3), str.substring(6));
 		}
 
-
 		List<String> downloadedFileList = Arrays.asList(new File(dlFolder).list());
 
 		for (String dlFileName : downloadedFileList) {
-			System.out.println("dlFileName: "+dlFileName);
-			System.out.println("Length: "+dlFileName.split("[.]").length);
+			System.out.println("dlFileName: " + dlFileName);
+			System.out.println("Length: " + dlFileName.split("[.]").length);
 
 			String headerFileName = dlFileName.split("[.]")[0];
 
-			String dlFileReName = headerFileName+" - "+nameMap.get(headerFileName)+".mp3";
+			String dlFileReName = headerFileName + " - " + nameMap.get(headerFileName) + ".mp3";
 
 			File file = new File(dlFolder + dlFileName);
 
 			File newFile = new File(dataFolder + dlFileReName);
 
-
-			if(newFile.exists()) {
-				System.out.println("File already present, rename skipped! "+newFile.getName());
-			}
-			else
+			if (newFile.exists()) {
+				System.out.println("File already present, rename skipped! " + newFile.getName());
+			} else
 				FileUtils.moveFile(file, newFile);
 
 			System.out.println("File renamed successfully? " + newFile.exists());
@@ -121,17 +118,19 @@ public class RenameBulkFile {
 			long fileSize = ip.openConnection().getContentLength();
 			totalSize = totalSize + fileSize;
 			fileDatum.put(fileSize, ip.toURI().toString());
+			String FILE_NAME = folderFILE_NAME.split("/")[1];
+			String folderFILE_NAMESagregated = folderFILE_NAME.split("/")[0] + "/" + getFolderSagregated() + FILE_NAME;
 
 			try (BufferedInputStream in = new BufferedInputStream(new URL(FILE_URL).openStream());
-				 FileOutputStream fileOutputStream = new FileOutputStream(folderFILE_NAME)) {
+					FileOutputStream fileOutputStream = new FileOutputStream(folderFILE_NAME);
+					FileOutputStream fileOutputStreamSagregated = new FileOutputStream(folderFILE_NAMESagregated)) {
 				byte[] dataBuffer = new byte[1024];
 				int bytesRead;
 				double tempInt = 0;
-				String FILE_NAME = folderFILE_NAME.split("/")[1];
 				System.out.println("Download started for file: " + FILE_NAME + ", size: " + getUnit(fileSize));
 
 				while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-					double fileDlProgress = 0.0f;
+					double fileDlProgress;
 					totalBytesRead = (totalBytesRead + bytesRead);
 					fileDlProgress = (double) ((totalBytesRead * 100) / fileSize);
 
@@ -139,23 +138,46 @@ public class RenameBulkFile {
 						System.out.println("Download progress for file: - '" + FILE_NAME + "' - "
 								+ String.format("%.0f", fileDlProgress) + "%" + " - "
 								+ (getUnit(totalBytesRead).replaceAll(" ", "") + " / "
-								+ getUnit(fileSize).replaceAll(" ", "")));
+										+ getUnit(fileSize).replaceAll(" ", "")));
 						tempInt = (int) fileDlProgress;
 					}
 					if (fileSize == totalBytesRead) {
 						System.out.println("Downloaded successfully - '" + FILE_NAME + "', file size: "
 								+ getUnit(fileSize) + "\n");
-						Thread.sleep(300);
 					}
-					fileOutputStream.write(dataBuffer, 0, bytesRead);
+//					fileOutputStream.write(dataBuffer, 0, bytesRead);
+					fileOutputStreamSagregated.write(dataBuffer, 0, bytesRead);
 				}
 				fileOutputStream.flush();
-			} catch (IOException | InterruptedException e) {
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		} else
 			System.out.println("File exists, download SKIPPED for " + folderFILE_NAME);
 
+	}
+
+	public static String getFolderSagregated() {
+		String sagrFolder = "";
+		long tempSize = totalSize;
+		if (tempSize > 0) {
+			sagrFolder = "VerySmall/";
+			tempSize = tempSize / 1024;
+		}
+		if (tempSize > 0) {
+			sagrFolder = "Small/";
+			tempSize = tempSize / 1024;
+		}
+		if (tempSize >= 1) {
+			sagrFolder = "Medium/";
+		}
+		if (tempSize > 20) {
+			sagrFolder = "Large/";
+		}
+		if (tempSize > 34) {
+			sagrFolder = "Huge/";
+		}
+		return sagrFolder;
 	}
 
 	public static void fileSizeFetcher(String FILE_URL, String FILE_NAME) throws IOException, URISyntaxException {
@@ -164,7 +186,7 @@ public class RenameBulkFile {
 		fileDatumCheck.put(fileSize, ip.toURI().toString());
 
 		try (BufferedInputStream in = new BufferedInputStream(null);
-			 FileOutputStream fileOutputStream = new FileOutputStream(FILE_NAME)) {
+				FileOutputStream fileOutputStream = new FileOutputStream(FILE_NAME)) {
 			fileOutputStream.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -176,16 +198,16 @@ public class RenameBulkFile {
 
 		String unit = "";
 
-		if (fileSize > 1000) {
-			fileSize = fileSize / 1000;
+		if (fileSize > 1024) {
+			fileSize = fileSize / 1024;
 			unit = String.valueOf(fileSize) + " KB";
 		}
-		if (fileSize > 1000) {
-			fileSize = fileSize / 1000;
+		if (fileSize > 1024) {
+			fileSize = fileSize / 1024;
 			unit = String.valueOf(fileSize) + " MB";
 		}
-		if (fileSize > 1000) {
-			fileSize = fileSize / 1000;
+		if (fileSize > 1024) {
+			fileSize = fileSize / 1024;
 			unit = String.valueOf(fileSize) + " GB";
 		}
 
