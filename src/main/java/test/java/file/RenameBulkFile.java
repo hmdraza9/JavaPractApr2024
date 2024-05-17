@@ -32,7 +32,7 @@ public class RenameBulkFile {
 	static long totalSize;
 
 	public static void main(String[] args) throws IOException, URISyntaxException {
-		fileDownloadManager(2, 2);
+		fileDownloadManager(3, 3);
 //		renameFiles();
 		System.out.println("Total files size: " + getUnit(totalSize));
 	}
